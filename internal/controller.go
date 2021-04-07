@@ -83,7 +83,7 @@ func Completer(doc prompt.Document) []prompt.Suggest {
 	if len(word) == 0 {
 		return nil
 	}
-	list := Cfg.PageList()
+	list := Cfg.AllList()
 	if len(list) == 0 {
 		return nil
 	}
@@ -126,13 +126,14 @@ func Executor(input string) {
 		ShowUsageGuide()
 	default:
 		var server *Server
-		for i, j := 0, len(Cfg.Servers); i < j; i++ {
-			if Cfg.Servers[i].Name == input {
+		all := Cfg.AllList()
+		for i, j := 0, len(all); i < j; i++ {
+			if all[i].Name == input {
 				if server != nil {
 					Error("There is a remote server with the same name: %s.", input)
 					return
 				}
-				server = Cfg.Servers[i]
+				server = all[i]
 			}
 		}
 		if server == nil {
