@@ -58,6 +58,13 @@ func CheckAndPrintUsageGuide() {
         switch os.Args[i] {
         case "--help", "-help", "-h":
             ShowUsageGuide()
+            prefix := strings.Repeat(" ", 5)
+            Echo(prefix + color.GreenString("Command Args:"))
+            Echo(prefix + color.GreenString("  -h, -help, --help"))
+            Echo(prefix + color.GreenString("    Print this message and exit."))
+            Echo(prefix + color.GreenString("  -v, -version, --version"))
+            Echo(prefix + color.GreenString("    Print J2 version and exit."))
+            Echo("")
             os.Exit(0)
         }
     }
