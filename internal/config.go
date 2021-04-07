@@ -74,7 +74,7 @@ func (c *Config) Init() error {
 }
 
 func (c *Config) NextPage() {
-	if c.Page*c.PageSize >= len(c.Servers) {
+	if c.Page*c.PageSize >= len(c.AllList()) {
 		c.Page = 1
 	} else {
 		c.Page++
@@ -84,7 +84,7 @@ func (c *Config) NextPage() {
 func (c *Config) PrevPage() {
 	c.Page--
 	if c.Page < 1 {
-		if n := len(c.Servers); n > 0 {
+		if n := len(c.AllList()); n > 0 {
 			c.Page = (n - n%c.PageSize) / c.PageSize
 			if n%c.PageSize > 0 {
 				c.Page++
@@ -95,9 +95,23 @@ func (c *Config) PrevPage() {
 	}
 }
 
+func (c *Config) AllList() []*Server {
+	if c.Group == "" || c.Group == "default" {
+		return c.Servers
+	}
+	r := make([]*Server, 0)
+	for i, j := 0, len(c.Servers); i < j; i++ {
+		if c.Servers[i].Group == c.Group {
+			r = append(r, c.Servers[i])
+		}
+	}
+	return r
+}
+
 func (c *Config) PageList() []*Server {
 	var list []*Server
-	if n := len(c.Servers); n > 0 {
+	all := c.AllList()
+	if n := len(all); n > 0 {
 		begin := (c.Page - 1) * c.PageSize
 		end := c.Page * c.PageSize
 		if begin >= n {
@@ -105,16 +119,15 @@ func (c *Config) PageList() []*Server {
 			end = c.PageSize
 		}
 		if end >= n {
-			list = c.Servers[begin:]
+			list = all[begin:]
 		} else {
-			list = c.Servers[begin:end]
+			list = all[begin:end]
 		}
 	}
 	return list
 }
 
-func (c *Config) Summary() []string {
-	list := c.PageList()
+func (c *Config) Summary(list []*Server) []string {
 	if len(list) == 0 {
 		return nil
 	}
@@ -170,16 +183,13 @@ func (c *Config) ShowSummary() {
 	ShowTitle()
 
 	var n int
-	summary := c.Summary()
+	summary := c.Summary(c.PageList())
 	for i, j := 0, len(summary); i < j; i++ {
 		if nn := runewidth.StringWidth(summary[i]); nn > n {
-			n = len(summary[i])
+			n = nn
 		}
 	}
-	if n < 70 {
-		n = 70
-	}
-	line := color.RedString(strings.Repeat("-", n-20))
+	line := color.RedString(strings.Repeat("-", n))
 
 	Echo(line)
 	if len(summary) > 0 {
@@ -191,7 +201,7 @@ func (c *Config) ShowSummary() {
 	}
 	Echo(line)
 
-	l := len(c.Servers)
+	l := len(c.AllList())
 	max := (l - l%c.PageSize) / c.PageSize
 	if l%c.PageSize > 0 {
 		max++
@@ -199,7 +209,8 @@ func (c *Config) ShowSummary() {
 	if max == 0 {
 		max = 1
 	}
-	Echo(strings.Repeat(" ", 5) + color.New(color.FgHiYellow).Sprintf("page %d of %d", c.Page, max))
+
+	Echo(strings.Repeat(" ", 7) + color.YellowString("Page: %d/%d", c.Page, max))
 }
 
 func (c *Config) exist(s string) bool {

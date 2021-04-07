@@ -34,6 +34,7 @@ var CommandSuggests = []prompt.Suggest{
 	{Text: "-n", Description: "Displays the next page of the server list."},
 	{Text: "-p", Description: "Displays the previous page of the server list."},
 	{Text: "-g", Description: "Set the group for the server list."},
+	{Text: "-h", Description: "Display the usage guide of J2."},
 }
 
 func Completer(doc prompt.Document) []prompt.Suggest {
@@ -50,7 +51,7 @@ func Completer(doc prompt.Document) []prompt.Suggest {
 			return nil
 		}
 		if strings.HasPrefix(text, "-g ") {
-			list := Cfg.PageList()
+			list := Cfg.Servers
 			if len(list) == 0 {
 				return nil
 			}
@@ -121,16 +122,21 @@ func Executor(input string) {
 		Cfg.Group = group
 		Cfg.Page = 1
 		Cfg.ShowSummary()
+	case text == "-h":
+		ShowUsageGuide()
 	default:
-		list := Cfg.PageList()
 		var server *Server
-		for i, j := 0, len(list); i < j; i++ {
-			if list[i].Name == input {
-				server = list[i]
-				break
+		for i, j := 0, len(Cfg.Servers); i < j; i++ {
+			if Cfg.Servers[i].Name == input {
+				if server != nil {
+					Error("There is a remote server with the same name: %s.", input)
+					return
+				}
+				server = Cfg.Servers[i]
 			}
 		}
 		if server == nil {
+			list := Cfg.PageList()
 			n, err := strconv.Atoi(input)
 			if err == nil {
 				n--
@@ -140,7 +146,7 @@ func Executor(input string) {
 			}
 		}
 		if server == nil {
-			Error("Instruction %q is invalid.", input)
+			Error("Instruction %q is invalid. Please use -h to view the usage guide.", input)
 			return
 		}
 		err := Connect(server)
