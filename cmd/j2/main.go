@@ -22,6 +22,7 @@ import (
 
 func main() {
 	internal.CheckAndPrintVersion()
+	internal.CheckAndPrintUsageGuide()
 
 	if err := internal.Cfg.Init(); err != nil {
 		internal.ErrorAndExit("Init config failed: %s", err)

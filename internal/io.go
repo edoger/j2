@@ -17,7 +17,6 @@ package internal
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/fatih/color"
 )
@@ -55,35 +54,4 @@ func ClearScreen() {
 
 func ShowTitle() {
 	Echo(color.MagentaString("\r\n   J2 - A Micro Remote Server Management Client\r\n"))
-}
-
-func ShowUsageGuide() {
-	Echo("")
-	var size int
-	for i, j := 0, len(CommandSuggests); i < j; i++ {
-		if n := len(CommandSuggests[i].Text); n > size {
-			size = n
-		}
-	}
-	format := fmt.Sprintf("%%-%ds", size)
-	var texts []string
-	for i, j := 0, len(CommandSuggests); i < j; i++ {
-		texts = append(texts, "  "+fmt.Sprintf(format, CommandSuggests[i].Text)+"  "+CommandSuggests[i].Description)
-	}
-	texts = append(texts, "")
-	texts = append(texts, "* Enter the number/name and press <Enter> to automatically connect to")
-	texts = append(texts, "  the corresponding remote server.")
-	texts = append(texts, "* Use Control+C to exit J2.")
-
-	prefix := strings.Repeat(" ", 5)
-	Echo(prefix + color.GreenString("J2 Usage Guide:"))
-	Echo("")
-	for i, j := 0, len(texts); i < j; i++ {
-		if texts[i] == "" {
-			Echo("")
-		} else {
-			Echo(prefix + color.GreenString(texts[i]))
-		}
-	}
-	Echo("")
 }
