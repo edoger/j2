@@ -246,23 +246,23 @@ func loop(wg *sync.WaitGroup, exit chan struct{}, r int, w io.WriteCloser) {
 		case <-exit:
 			return
 		default:
-			if n, err := syscall.Read(r, buf); err != nil {
-				Error("Read input error: %s", err)
-			} else {
-				select {
-				case <-exit:
-					return
-				default:
-				}
-				token := translate(buf[:n])
-				if len(token) > 0 {
-					_, err = w.Write(token)
-					if err != nil {
-						if err == io.EOF {
-							return
-						}
-						Error("Write error: %s", err)
+		}
+		if n, err := syscall.Read(r, buf); err != nil {
+			Error("Read input error: %s", err)
+		} else {
+			select {
+			case <-exit:
+				return
+			default:
+			}
+			token := translate(buf[:n])
+			if len(token) > 0 {
+				_, err = w.Write(token)
+				if err != nil {
+					if err == io.EOF {
+						return
 					}
+					Error("Write error: %s", err)
 				}
 			}
 		}
