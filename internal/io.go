@@ -38,9 +38,9 @@ func EchoAndExit(format string, args ...interface{}) {
 func Error(format string, args ...interface{}) {
 	prefix := color.New(color.FgHiRed).Sprint("ERROR")
 	if len(args) == 0 {
-		fmt.Printf("%s %s\r\n", prefix, color.New(color.FgRed).Sprint(format))
+		fmt.Printf("%s %s\r\n", prefix, color.RedString(format))
 	} else {
-		fmt.Printf("%s %s\r\n", prefix, color.New(color.FgRed).Sprint(fmt.Sprintf(format, args...)))
+		fmt.Printf("%s %s\r\n", prefix, color.RedString(format, args...))
 	}
 }
 
