@@ -53,5 +53,5 @@ func ClearScreen() {
 }
 
 func ShowTitle() {
-	Echo(color.MagentaString("\r\n   J2 - A Micro Remote Server Management Client\r\n"))
+	Echo(color.MagentaString("\r\n   J2 - A Micro Remote Server Management Client - %s\r\n", Version))
 }
