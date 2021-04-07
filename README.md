@@ -16,17 +16,23 @@
 ## Usage ##
 
 ```
- J2 Usage Guide:
+     J2 Usage Guide:
 
-   -n     Displays the next page of the server list.
-   -p     Displays the previous page of the server list.
-   -g     Set the group for the server list.
-   -h     Display the usage guide of J2.
-   -exit  Exit J2.
+       -n     Displays the next page of the server list.
+       -p     Displays the previous page of the server list.
+       -g     Set the group for the server list.
+       -h     Display the usage guide of J2.
+       -exit  Exit J2.
 
- * Enter the number/name and press <Enter> to automatically connect to
-   the corresponding remote server.
- * Use Control+C to exit J2.
+     * Enter the number/name and press <Enter> to automatically connect to
+       the corresponding remote server.
+     * Use <Control+C> to exit J2.
+
+     Command Args:
+       -h, -help, --help
+         Print this message and exit.
+       -v, -version, --version
+         Print J2 version and exit.
 ```
 
 ## License ##
