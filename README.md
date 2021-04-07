@@ -1,6 +1,4 @@
-# J2 #
-
-A micro remote server management client.
+# J2 - A micro remote server management client. #
 
 [![demo](img.jpg)](https://github.com/edoger/j2)
 
