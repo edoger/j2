@@ -20,7 +20,7 @@ import (
 	"github.com/fatih/color"
 )
 
-const Version = "v0.0.1"
+const Version = "v0.0.2"
 
 func CheckAndPrintVersion() {
 	for i, j := 1, len(os.Args); i < j; i++ {
