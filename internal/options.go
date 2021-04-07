@@ -12,6 +12,10 @@ var KeyHandlers = map[prompt.Key]prompt.KeyBindFunc{
 	prompt.Enter:    DoEnter,
 	prompt.ControlM: DoEnter,
 	prompt.ControlJ: DoEnter,
+	prompt.PageUp:   DoPrevPage,
+	prompt.PageDown: DoNextPage,
+	prompt.Home:     DoFirstPage,
+	prompt.End:      DoLastPage,
 }
 
 func DoExit(*prompt.Buffer) {
@@ -19,6 +23,27 @@ func DoExit(*prompt.Buffer) {
 }
 
 func DoEnter(*prompt.Buffer) {
+	Cfg.ShowSummary()
+}
+
+func DoPrevPage(*prompt.Buffer) {
+	Cfg.PrevPage()
+	Cfg.ShowSummary()
+}
+
+func DoNextPage(*prompt.Buffer) {
+	Cfg.NextPage()
+	Cfg.ShowSummary()
+}
+
+func DoFirstPage(*prompt.Buffer) {
+	Cfg.Page = 1
+	Cfg.ShowSummary()
+}
+
+func DoLastPage(*prompt.Buffer) {
+	Cfg.Page = 1
+	Cfg.PrevPage()
 	Cfg.ShowSummary()
 }
 
