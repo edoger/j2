@@ -26,6 +26,7 @@ import (
 	"time"
 
 	"github.com/c-bata/go-prompt"
+	"github.com/fatih/color"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/terminal"
 )
@@ -35,6 +36,7 @@ var CommandSuggests = []prompt.Suggest{
 	{Text: "-p", Description: "Displays the previous page of the server list."},
 	{Text: "-g", Description: "Set the group for the server list."},
 	{Text: "-h", Description: "Display the usage guide of J2."},
+	{Text: "-exit", Description: "Exit J2."},
 }
 
 func Completer(doc prompt.Document) []prompt.Suggest {
@@ -124,6 +126,8 @@ func Executor(input string) {
 		Cfg.ShowSummary()
 	case text == "-h":
 		ShowUsageGuide()
+	case text == "-exit":
+		EchoAndExit(color.HiGreenString("Bye~"))
 	default:
 		var server *Server
 		all := Cfg.AllList()

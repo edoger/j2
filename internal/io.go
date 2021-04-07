@@ -59,9 +59,16 @@ func ShowTitle() {
 
 func ShowUsageGuide() {
 	Echo("")
+	var size int
+	for i, j := 0, len(CommandSuggests); i < j; i++ {
+		if n := len(CommandSuggests[i].Text); n > size {
+			size = n
+		}
+	}
+	format := fmt.Sprintf("%%-%ds", size)
 	var texts []string
 	for i, j := 0, len(CommandSuggests); i < j; i++ {
-		texts = append(texts, "  "+CommandSuggests[i].Text+"  "+CommandSuggests[i].Description)
+		texts = append(texts, "  "+fmt.Sprintf(format, CommandSuggests[i].Text)+"  "+CommandSuggests[i].Description)
 	}
 	texts = append(texts, "")
 	texts = append(texts, "* Enter the number/name and press <Enter> to automatically connect to")
