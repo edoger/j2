@@ -1,6 +1,8 @@
 package internal
 
 import (
+	"fmt"
+
 	"github.com/c-bata/go-prompt"
 	"github.com/fatih/color"
 )
@@ -9,6 +11,7 @@ var KeyHandlers = map[prompt.Key]prompt.KeyBindFunc{
 	prompt.ControlC: DoExit,
 	prompt.Enter:    DoEnter,
 	prompt.ControlM: DoEnter,
+	prompt.ControlJ: DoEnter,
 }
 
 func DoExit(*prompt.Buffer) {
@@ -16,8 +19,14 @@ func DoExit(*prompt.Buffer) {
 }
 
 func DoEnter(*prompt.Buffer) {
-	ClearScreen()
 	Cfg.ShowSummary()
+}
+
+func DoMakeLivePrefix() (string, bool) {
+	if Cfg.Group != "" {
+		return fmt.Sprintf("j2 [%s] >> ", Cfg.Group), true
+	}
+	return "", false
 }
 
 func Options() []prompt.Option {
@@ -41,5 +50,6 @@ func Options() []prompt.Option {
 		prompt.OptionSelectedDescriptionTextColor(prompt.Fuchsia),
 		prompt.OptionSelectedDescriptionBGColor(prompt.Yellow),
 		prompt.OptionCompletionOnDown(),
+		prompt.OptionLivePrefix(DoMakeLivePrefix),
 	}
 }

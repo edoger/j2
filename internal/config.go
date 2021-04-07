@@ -40,8 +40,9 @@ type Config struct {
 	Password   string    `yaml:"password"`   // 全局的登录密码（可被服务器设置覆盖）
 	Servers    []*Server `yaml:"servers"`    // 远程服务器列表
 
-	Auth ssh.AuthMethod `yaml:"-"`
-	Page int            `yaml:"-"`
+	Auth  ssh.AuthMethod `yaml:"-"`
+	Page  int            `yaml:"-"`
+	Group string         `yaml:"-"`
 }
 
 func NewConfig() *Config {
@@ -240,13 +241,13 @@ func (c *Config) init(s *Server) error {
 		return fmt.Errorf("the server host can not be empty")
 	}
 	if s.PrivateKey == "" && s.Password == "" {
-		s.PrivateKey = c.PrivateKey
-		s.Password = c.Password
-	}
-	if auth, err := c.auth(s.PrivateKey, s.Password); err != nil {
-		return err
+		s.Auth = c.Auth
 	} else {
-		s.Auth = auth
+		if auth, err := c.auth(s.PrivateKey, s.Password); err != nil {
+			return err
+		} else {
+			s.Auth = auth
+		}
 	}
 	if s.Port == 0 {
 		s.Port = 22
