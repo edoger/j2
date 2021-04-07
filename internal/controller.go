@@ -15,8 +15,10 @@
 package internal
 
 import (
+	"fmt"
 	"io"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -28,27 +30,76 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
+var CommandSuggests = []prompt.Suggest{
+	{Text: "-n", Description: "Displays the next page of the server list."},
+	{Text: "-p", Description: "Displays the previous page of the server list."},
+	{Text: "-g", Description: "Set the group for the server list."},
+}
+
 func Completer(doc prompt.Document) []prompt.Suggest {
-	// 控制命令
 	text := doc.TextBeforeCursor()
-	if strings.HasPrefix(text, "-") {
-		return []prompt.Suggest{
-			{Text: "-n", Description: "下一页"},
-			{Text: "-p", Description: "上一页"},
-		}
-	}
 	if text == "" {
 		return nil
 	}
-	var suggests []prompt.Suggest
+	word := doc.GetWordBeforeCursor()
+	if strings.HasPrefix(text, "-") {
+		if text == "-" {
+			return CommandSuggests
+		}
+		if strings.TrimSpace(text[1:]) == "" {
+			return nil
+		}
+		if strings.HasPrefix(text, "-g ") {
+			list := Cfg.PageList()
+			if len(list) == 0 {
+				return nil
+			}
+			counts := make(map[string]int)
+			for i, j := 0, len(list); i < j; i++ {
+				counts[list[i].Group]++
+			}
+			groups := make([]string, 0, len(counts))
+			for g := range counts {
+				groups = append(groups, g)
+			}
+			if len(groups) > 1 {
+				sort.Strings(groups)
+			}
+			suggests := make([]prompt.Suggest, 0, len(groups))
+			for i, j := 0, len(groups); i < j; i++ {
+				suggests = append(suggests, prompt.Suggest{
+					Text:        groups[i],
+					Description: fmt.Sprintf("Group %s contains %d server(s).", groups[i], counts[groups[i]]),
+				})
+			}
+			return prompt.FilterFuzzy(suggests, word, true)
+		}
+		if strings.HasSuffix(text, " ") {
+			return nil
+		}
+		return prompt.FilterHasPrefix(CommandSuggests, text, true)
+	}
+	if len(word) == 0 {
+		return nil
+	}
 	list := Cfg.PageList()
+	if len(list) == 0 {
+		return nil
+	}
+	suggests := make([]prompt.Suggest, 0, len(list))
 	for i, j := 0, len(list); i < j; i++ {
 		suggests = append(suggests, prompt.Suggest{
 			Text:        list[i].Name,
 			Description: list[i].Desc,
 		})
 	}
-	return prompt.FilterFuzzy(suggests, doc.GetWordBeforeCursor(), true)
+	if prefixed := prompt.FilterHasPrefix(suggests, word, true); len(prefixed) == 0 {
+		num, _ := strconv.Atoi(word)
+		if num > 0 && num <= len(suggests) {
+			return nil
+		}
+	}
+	return prompt.FilterFuzzy(suggests, word, true)
 }
 
 func Executor(input string) {
@@ -57,12 +108,18 @@ func Executor(input string) {
 		return
 	}
 
-	switch input {
-	case "-n":
+	text := strings.TrimSpace(input)
+	switch {
+	case text == "-n":
 		Cfg.NextPage()
 		Cfg.ShowSummary()
-	case "-p":
+	case text == "-p":
 		Cfg.PrevPage()
+		Cfg.ShowSummary()
+	case strings.HasPrefix(text, "-g"):
+		group := strings.TrimSpace(text[2:])
+		Cfg.Group = group
+		Cfg.Page = 1
 		Cfg.ShowSummary()
 	default:
 		list := Cfg.PageList()
@@ -83,7 +140,7 @@ func Executor(input string) {
 			}
 		}
 		if server == nil {
-			Error("Unknown input: %s", input)
+			Error("Instruction %q is invalid.", input)
 			return
 		}
 		err := Connect(server)

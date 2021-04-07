@@ -23,9 +23,9 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"unicode/utf8"
 
 	"github.com/fatih/color"
+	"github.com/mattn/go-runewidth"
 	"golang.org/x/crypto/ssh"
 	"gopkg.in/yaml.v2"
 )
@@ -84,8 +84,7 @@ func (c *Config) NextPage() {
 func (c *Config) PrevPage() {
 	c.Page--
 	if c.Page < 1 {
-		n := len(c.Servers)
-		if n > 0 {
+		if n := len(c.Servers); n > 0 {
 			c.Page = (n - n%c.PageSize) / c.PageSize
 			if n%c.PageSize > 0 {
 				c.Page++
@@ -121,19 +120,19 @@ func (c *Config) Summary() []string {
 	}
 	counts := []int{4, 4, 4, 5, 4} // name user host group desc
 	for i, j := 0, len(list); i < j; i++ {
-		if n := utf8.RuneCountInString(list[i].Name); n > counts[0] { // name
+		if n := runewidth.StringWidth(list[i].Name); n > counts[0] { // name
 			counts[0] = n
 		}
-		if n := utf8.RuneCountInString(list[i].User); n > counts[1] { // user
+		if n := runewidth.StringWidth(list[i].User); n > counts[1] { // user
 			counts[1] = n
 		}
-		if n := utf8.RuneCountInString(list[i].Host); n > counts[2] { // host
+		if n := runewidth.StringWidth(list[i].Host); n > counts[2] { // host
 			counts[2] = n
 		}
-		if n := utf8.RuneCountInString(list[i].Group); n > counts[3] { // group
+		if n := runewidth.StringWidth(list[i].Group); n > counts[3] { // group
 			counts[3] = n
 		}
-		if n := utf8.RuneCountInString(list[i].Desc); n > counts[4] { // desc
+		if n := runewidth.StringWidth(list[i].Desc); n > counts[4] { // desc
 			counts[4] = n
 		}
 	}
@@ -173,7 +172,7 @@ func (c *Config) ShowSummary() {
 	var n int
 	summary := c.Summary()
 	for i, j := 0, len(summary); i < j; i++ {
-		if nn := utf8.RuneCountInString(summary[i]); nn > n {
+		if nn := runewidth.StringWidth(summary[i]); nn > n {
 			n = len(summary[i])
 		}
 	}
