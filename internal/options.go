@@ -12,7 +12,7 @@ var KeyHandlers = map[prompt.Key]prompt.KeyBindFunc{
 }
 
 func DoExit(*prompt.Buffer) {
-	EchoAndExit(color.HiGreenString(" Bye~"))
+	EchoAndExit(color.HiGreenString("Bye~"))
 }
 
 func DoEnter(*prompt.Buffer) {
@@ -25,9 +25,21 @@ func Options() []prompt.Option {
 	for key, fn := range KeyHandlers {
 		binds = append(binds, prompt.KeyBind{Key: key, Fn: fn})
 	}
+
 	return []prompt.Option{
 		prompt.OptionTitle("J2 - A Micro Remote Server Management Client"),
 		prompt.OptionPrefix("j2 >> "),
 		prompt.OptionAddKeyBind(binds...),
+		prompt.OptionPrefixTextColor(prompt.Blue),
+		prompt.OptionPrefixBackgroundColor(prompt.DefaultColor),
+		prompt.OptionSuggestionTextColor(prompt.Brown),
+		prompt.OptionSuggestionBGColor(prompt.DefaultColor),
+		prompt.OptionSelectedSuggestionTextColor(prompt.Red),
+		prompt.OptionSelectedSuggestionBGColor(prompt.Yellow),
+		prompt.OptionDescriptionTextColor(prompt.Cyan),
+		prompt.OptionDescriptionBGColor(prompt.DefaultColor),
+		prompt.OptionSelectedDescriptionTextColor(prompt.Fuchsia),
+		prompt.OptionSelectedDescriptionBGColor(prompt.Yellow),
+		prompt.OptionCompletionOnDown(),
 	}
 }
