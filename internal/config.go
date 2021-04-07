@@ -189,6 +189,9 @@ func (c *Config) ShowSummary() {
 			n = nn
 		}
 	}
+	if n == 0 {
+		n = 55
+	}
 	line := color.RedString(strings.Repeat("-", n))
 
 	Echo(line)
@@ -210,7 +213,7 @@ func (c *Config) ShowSummary() {
 		max = 1
 	}
 
-	Echo(strings.Repeat(" ", 7) + color.YellowString("Page: %d/%d", c.Page, max))
+	Echo(strings.Repeat(" ", 7) + color.YellowString("Page: %d/%d  Total: %d", c.Page, max, l))
 }
 
 func (c *Config) exist(s string) bool {
