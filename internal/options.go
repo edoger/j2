@@ -12,7 +12,7 @@ var KeyHandlers = map[prompt.Key]prompt.KeyBindFunc{
 }
 
 func DoExit(*prompt.Buffer) {
-	EchoAndExit(color.New(color.FgHiGreen).Sprint(" Bye~"))
+	EchoAndExit(color.HiGreenString(" Bye~"))
 }
 
 func DoEnter(*prompt.Buffer) {
@@ -26,8 +26,7 @@ func Options() []prompt.Option {
 		binds = append(binds, prompt.KeyBind{Key: key, Fn: fn})
 	}
 	return []prompt.Option{
-		prompt.OptionTitle(Title),
-		// prompt.OptionShowCompletionAtStart(),
+		prompt.OptionTitle("J2 - A Micro Remote Server Management Client"),
 		prompt.OptionPrefix("j2 >> "),
 		prompt.OptionAddKeyBind(binds...),
 	}

@@ -30,8 +30,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const Title = "J2 - A Micro Remote Server Management Client"
-
 var Cfg = NewConfig()
 
 type Config struct {
@@ -145,9 +143,9 @@ func (c *Config) Summary() []string {
 	}
 	num := len(strconv.Itoa(len(list)))
 	format := fmt.Sprintf(" %%-%ds  %%-%ds  %%-%ds %%-%ds  %%-%ds  %%-%ds", num, counts[0], counts[1], counts[2], counts[3], counts[4])
-	prefix := color.New(color.FgHiGreen).Sprint("**")
+	prefix := color.New(color.FgHiGreen).Sprint(" **")
 	summary := make([]string, 0, len(list)+1)
-	summary = append(summary, "  "+color.New(color.FgYellow).Sprintf(format, "", "NAME", "USER", "HOST", "GROUP", "DESC"))
+	summary = append(summary, "   "+color.New(color.FgYellow).Sprintf(format, "", "NAME", "USER", "HOST", "GROUP", "DESC"))
 	for i, j := 0, len(list); i < j; i++ {
 		// name user host group desc
 		args := []interface{}{
@@ -169,18 +167,30 @@ func (c *Config) stuff(s string) string {
 
 func (c *Config) ShowSummary() {
 	ClearScreen()
-	summary := c.Summary()
-	Echo("")
-	Echo(strings.Repeat(" ", 3) + color.New(color.FgMagenta).Sprint(Title))
-	Echo("")
+	ShowTitle()
+
 	var n int
+	summary := c.Summary()
 	for i, j := 0, len(summary); i < j; i++ {
-		Echo(summary[i])
 		if nn := utf8.RuneCountInString(summary[i]); nn > n {
 			n = len(summary[i])
 		}
 	}
-	Echo(color.New(color.FgRed).Sprint(strings.Repeat("-", n-20)))
+	if n < 70 {
+		n = 70
+	}
+	line := color.RedString(strings.Repeat("-", n-20))
+
+	Echo(line)
+	if len(summary) > 0 {
+		for i, j := 0, len(summary); i < j; i++ {
+			Echo(summary[i])
+		}
+	} else {
+		Echo(color.YellowString("   There are no remote servers."))
+	}
+	Echo(line)
+
 	l := len(c.Servers)
 	max := (l - l%c.PageSize) / c.PageSize
 	if l%c.PageSize > 0 {

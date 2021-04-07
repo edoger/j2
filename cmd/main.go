@@ -27,7 +27,6 @@ func main() {
 		internal.ErrorAndExit("Init config failed: %s", err)
 	}
 
-	internal.ClearScreen()
 	internal.Cfg.ShowSummary()
 
 	p := prompt.New(internal.Executor, internal.Completer, internal.Options()...)

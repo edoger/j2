@@ -51,3 +51,7 @@ func ErrorAndExit(format string, args ...interface{}) {
 func ClearScreen() {
 	fmt.Print("\033c")
 }
+
+func ShowTitle() {
+	Echo(color.MagentaString("\r\n   J2 - A Micro Remote Server Management Client\r\n"))
+}
