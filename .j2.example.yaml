@@ -1,0 +1,16 @@
+# The J2 config file. (~/.j2.yaml)
+
+pageSize: 6
+sortBy: ""
+privateKey: "~/.ssh/id_rsa"
+password: ""
+
+servers:
+  - name: "test"
+    user: "root"
+    host: "192.168.0.2"
+    port: 22
+    group: ""
+    privateKey: "~/.ssh/id_rsa"
+    password: ""
+    desc: "My server."
