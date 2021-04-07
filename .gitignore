@@ -17,3 +17,6 @@
 
 # GoLand
 .idea/
+
+# Dev config
+.j2.yaml
