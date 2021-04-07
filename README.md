@@ -4,7 +4,12 @@
 
 ## Installation ##
 
-- Use ``` go get -u github.com/edoger/j2/cmd/j2 ```
+- Build from source code.
+  ```
+   git clone https://github.com/edoger/j2.git
+   cd j2
+   go build -o /usr/local/bin/j2 cmd/j2/main.go
+  ```
 - Download the compiled binary file from the [release page](https://github.com/edoger/j2/releases).
 - Copy the config file ``` .j2.example.yaml ``` to ``` $HOME/.j2.yaml ``` and edit it.
 
