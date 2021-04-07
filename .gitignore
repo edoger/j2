@@ -20,3 +20,6 @@
 
 # Dev config
 .j2.yaml
+
+# Build
+build/
