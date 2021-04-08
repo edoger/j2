@@ -26,7 +26,7 @@
 
      * Enter the number/name and press <Enter> to automatically connect to
        the corresponding remote server.
-     * Use <Control+C> to exit J2.
+     * Use <Control+D> to exit J2.
 
      Command Args:
        -h, -help, --help
