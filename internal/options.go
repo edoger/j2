@@ -16,13 +16,14 @@ package internal
 
 import (
 	"fmt"
+	"sync/atomic"
 
 	"github.com/c-bata/go-prompt"
-	"github.com/fatih/color"
 )
 
+var DefaultConsoleParserWrapper = NewConsoleParserWrapper()
+
 var KeyHandlers = map[prompt.Key]prompt.KeyBindFunc{
-	prompt.ControlC: DoExit,
 	prompt.Enter:    DoEnter,
 	prompt.ControlM: DoEnter,
 	prompt.ControlJ: DoEnter,
@@ -30,10 +31,6 @@ var KeyHandlers = map[prompt.Key]prompt.KeyBindFunc{
 	prompt.PageDown: DoNextPage,
 	prompt.Home:     DoFirstPage,
 	prompt.End:      DoLastPage,
-}
-
-func DoExit(*prompt.Buffer) {
-	EchoAndExit(color.HiGreenString("Bye~"))
 }
 
 func DoEnter(*prompt.Buffer) {
@@ -90,5 +87,29 @@ func Options() []prompt.Option {
 		prompt.OptionSelectedDescriptionBGColor(prompt.Yellow),
 		prompt.OptionCompletionOnDown(),
 		prompt.OptionLivePrefix(DoMakeLivePrefix),
+		prompt.OptionParser(DefaultConsoleParserWrapper),
 	}
+}
+
+type ConsoleParserWrapper struct {
+	prompt.ConsoleParser
+	status int64
+}
+
+func NewConsoleParserWrapper() prompt.ConsoleParser {
+	return &ConsoleParserWrapper{ConsoleParser: prompt.NewStandardInputParser()}
+}
+
+func (w *ConsoleParserWrapper) Setup() error {
+	if atomic.CompareAndSwapInt64(&w.status, 0, 1) {
+		return w.ConsoleParser.Setup()
+	}
+	return nil
+}
+
+func (w *ConsoleParserWrapper) TearDown() error {
+	if atomic.CompareAndSwapInt64(&w.status, 1, 0) {
+		return w.ConsoleParser.TearDown()
+	}
+	return nil
 }

@@ -17,9 +17,26 @@ package internal
 import (
 	"fmt"
 	"os"
+	"sync"
 
 	"github.com/fatih/color"
+	"golang.org/x/crypto/ssh/terminal"
 )
+
+var State *terminal.State
+var mu sync.Mutex
+
+func init() {
+	mu.Lock()
+	defer mu.Unlock()
+	in := int(os.Stdin.Fd())
+	state, err := terminal.MakeRaw(in)
+	if err != nil {
+		panic(err)
+	}
+	State = state
+	_ = terminal.Restore(in, state)
+}
 
 func Echo(format string, args ...interface{}) {
 	if len(args) == 0 {
@@ -31,7 +48,7 @@ func Echo(format string, args ...interface{}) {
 
 func EchoAndExit(format string, args ...interface{}) {
 	Echo(format, args...)
-	os.Exit(0)
+	Exit(0)
 }
 
 func Error(format string, args ...interface{}) {
@@ -45,7 +62,7 @@ func Error(format string, args ...interface{}) {
 
 func ErrorAndExit(format string, args ...interface{}) {
 	Error(format, args)
-	os.Exit(1)
+	Exit(1)
 }
 
 func ClearScreen() {
@@ -54,4 +71,18 @@ func ClearScreen() {
 
 func ShowTitle() {
 	Echo(color.MagentaString("\r\n   J2 - A Micro Remote Server Management Client - %s\r\n", Version))
+}
+
+func Exit(n int) {
+	Reset()
+	os.Exit(n)
+}
+
+func Reset() {
+	mu.Lock()
+	if State != nil {
+		_ = terminal.Restore(int(os.Stdin.Fd()), State)
+	}
+	mu.Unlock()
+	_ = DefaultConsoleParserWrapper.TearDown()
 }

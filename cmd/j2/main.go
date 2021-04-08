@@ -29,6 +29,7 @@ func main() {
 	}
 
 	internal.Cfg.ShowSummary()
+	defer internal.Reset()
 
 	p := prompt.New(internal.Executor, internal.Completer, internal.Options()...)
 	p.Run()
