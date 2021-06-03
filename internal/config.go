@@ -15,6 +15,7 @@
 package internal
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -67,10 +68,22 @@ func (c *Config) Init() error {
 	if s := os.Getenv("J2_CONFIG_FILE"); s != "" {
 		return c.from(s)
 	}
-	if s := filepath.Join(os.Getenv("HOME"), ".j2.yaml"); c.exist(s) {
-		return c.from(s)
+	ss := []string{
+		filepath.Join(os.Getenv("HOME"), ".j2.yaml"),
+		filepath.Join(os.Getenv("HOME"), ".j2", "j2.yaml"),
+		"/usr/local/etc/j2.yaml",
+		"/usr/local/etc/j2/j2.yaml",
+		"/etc/j2.yaml",
+		"/etc/j2/j2.yaml",
+		".j2.yaml",
+		"j2.yaml",
 	}
-	return c.from(".j2.yaml")
+	for i, j := 0, len(ss); i < j; i++ {
+		if c.exist(ss[i]) {
+			return c.from(ss[i])
+		}
+	}
+	return errors.New("no config file")
 }
 
 func (c *Config) NextPage() {
