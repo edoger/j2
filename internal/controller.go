@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/signal"
 	"sort"
 	"strconv"
 	"strings"
@@ -216,9 +217,10 @@ func Connect(s *Server) error {
 	exit := make(chan struct{})
 
 	wg := new(sync.WaitGroup)
-	wg.Add(1)
+	wg.Add(2)
 
 	go loop(wg, exit, in, stdin)
+	go resize(wg, exit, sess, in)
 
 	err = sess.Wait()
 	close(exit)
@@ -265,6 +267,23 @@ func loop(wg *sync.WaitGroup, exit chan struct{}, r int, w io.WriteCloser) {
 					Error("Write error: %s", err)
 				}
 			}
+		}
+	}
+}
+
+func resize(wg *sync.WaitGroup, exit chan struct{}, sess *ssh.Session, in int) {
+	defer wg.Done()
+	ch := make(chan os.Signal)
+	signal.Notify(ch, syscall.SIGWINCH)
+	defer signal.Stop(ch)
+	for {
+		select {
+		case <-ch:
+			if width, height, err := terminal.GetSize(in); err == nil {
+				_ = sess.WindowChange(height, width)
+			}
+		case <-exit:
+			return
 		}
 	}
 }
